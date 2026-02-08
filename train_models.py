@@ -78,8 +78,8 @@ if __name__ == "__main__":
     parser.add_argument("--models", nargs="*", default=sorted(model_types.keys()))
     parser.add_argument("--cache", default=os.path.join("saved_models", "best_params.json"))
     parser.add_argument("--force-optimization", action="store_true")
-    parser.add_argument("--n-jobs", type=int, default=None, help="Number of CPU jobs for supported models.")
-    parser.add_argument("--xgb-gpu", action="store_true", help="Use XGBoost GPU training if available.")
+    parser.add_argument("--n-jobs", type=int, default=-1, help="Number of CPU jobs for supported models.")
+    parser.add_argument("--no-xgb-gpu", action="store_true", help="Disable XGBoost GPU training.")
     args = parser.parse_args()
 
     dataset_fn = DATASET_GETTERS[args.dataset]
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     xtr, xte, ytr, yte = train_test_split(
         X,
         Y,
-        train_size=int(len(Y) * args.train_size),
+        train_size=args.train_size,
         random_state=args.seed,
     )
 
@@ -99,6 +99,8 @@ if __name__ == "__main__":
         and cache.get("dataset") == args.dataset
         and cache.get("data_hash") == data_hash
         and cache.get("settings_hash") == settings_hash
+        and cache.get("train_size") == args.train_size
+        and cache.get("seed") == args.seed
     )
 
     models = dict()
@@ -123,7 +125,7 @@ if __name__ == "__main__":
             key,
             best_args,
             n_jobs=args.n_jobs,
-            use_xgb_gpu=args.xgb_gpu,
+            use_xgb_gpu=not args.no_xgb_gpu,
         )
         print(f"Model: {key},   Parameters: {train_args}")
         model = model_types[key](**train_args)
@@ -137,6 +139,8 @@ if __name__ == "__main__":
                 dataset=args.dataset,
                 data_hash=data_hash,
                 settings_hash=settings_hash,
+                train_size=args.train_size,
+                seed=args.seed,
                 models=cache_models,
             ),
         )

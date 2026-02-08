@@ -2,6 +2,67 @@
   "data_hash": "77dc8af6846920de60ee4772b49947d49225c2a79a568fbc8e83e1b5958ac179",
   "dataset": "pmma_normalized",
   "models": {
+    "DT": {
+      "args": {
+        "max_depth": 1,
+        "random_state": 40136
+      },
+      "mean_score": 0.19169393939393936,
+      "std_score": 0.1709594138250078
+    },
+    "KNN": {
+      "args": {
+        "n_neighbors": 5,
+        "weights": "distance"
+      },
+      "mean_score": 0.16452562425500128,
+      "std_score": 0.15254382520385837
+    },
+    "MLP": {
+      "args": {
+        "activation": "tanh",
+        "hidden_layer_sizes": [
+          64
+        ],
+        "learning_rate_init": 5e-05,
+        "max_iter": 10000,
+        "random_state": 40136,
+        "tol": 1e-09
+      },
+      "mean_score": 0.17631226845416742,
+      "std_score": 0.15663910869638062
+    },
+    "OLS": {
+      "args": {},
+      "mean_score": 0.18330343316429373,
+      "std_score": 0.16382465581870229
+    },
+    "PR": {
+      "args": {
+        "alpha": 4.0,
+        "degree": 2
+      },
+      "mean_score": 0.16648789537598546,
+      "std_score": 0.13826859040551517
+    },
+    "RF": {
+      "args": {
+        "max_depth": 2,
+        "n_estimators": 8,
+        "random_state": 40136
+      },
+      "mean_score": 0.17222840909090908,
+      "std_score": 0.1540160239004791
+    },
+    "SVM": {
+      "args": {
+        "C": 0.01,
+        "kernel": "rbf",
+        "tol": 1e-09
+      },
+      "mean_score": 0.17933787878787877,
+      "std_score": 0.15054554079439286
+    },
     "XGB": {
       "args": {
         "eta": 0.001,
@@ -9,9 +70,11 @@
         "n_estimators": 16,
         "seed": 40136
       },
-      "mean_score": 0.17262721727732094,
-      "std_score": 0.11935005354013561
+      "mean_score": 0.16328581445867363,
+      "std_score": 0.13301904904455325
     }
   },
-  "settings_hash": "dc3671b773ba242e6171e1a0062fb0b010c8228f266902745a7c473cf272f628"
+  "seed": 49163,
+  "settings_hash": "dc3671b773ba242e6171e1a0062fb0b010c8228f266902745a7c473cf272f628",
+  "train_size": 0.8
 }

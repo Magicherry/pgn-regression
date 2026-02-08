@@ -25,7 +25,7 @@ from sklearn.linear_model import Ridge
 import xgboost as xgb
 from xgboost import XGBRegressor
 
-from sklearn.metrics import mean_squared_error, mean_absolute_percentage_error, r2_score
+from sklearn.metrics import mean_squared_error, mean_absolute_error, mean_absolute_percentage_error, r2_score
 import re
 from parse import *
 import itertools
@@ -106,12 +106,12 @@ model_names = dict( OLS = "Ordinary Least Squares",
 
 
 ###############################################################################################
-# Leave-one-out cross-validation using MAPE as hyperparameter optimization objective...
+# Leave-one-out cross-validation using MAE as hyperparameter optimization objective...
 ###############################################################################################
 
 def score_model(model, X, Y):
     """
-    Compute the Mean Absolute Percentage Error (MAPE) for a given model.
+    Compute the Mean Absolute Error (MAE) for a given model.
 
     Parameters:
     - model: A trained model with a `predict` method.
@@ -119,18 +119,18 @@ def score_model(model, X, Y):
     - Y (ndarray): True target values of shape (n_samples,).
 
     Returns:
-    - mape (float): Mean Absolute Percentage Error between predictions and true values.
+    - mae (float): Mean Absolute Error between predictions and true values.
     """
     pred = model.predict(X)
-    mape = mean_absolute_percentage_error(y_true=Y, y_pred=pred)
-    return mape
+    mae = mean_absolute_error(y_true=Y, y_pred=pred)
+    return mae
 
 def train_models_loo(model, X, Y):
     """
     Perform Leave-One-Out (LOO) cross-validation on a given model.
 
     Trains the model iteratively, leaving out one data point at a time for 
-    validation, and computes the model's mean absolute percentage error (MAPE) 
+    validation, and computes the model's mean absolute error (MAE) 
     for each iteration.
 
     Parameters:
@@ -139,9 +139,9 @@ def train_models_loo(model, X, Y):
     - Y: Target variable array of shape (n_samples,).
 
     Returns:
-    - scores (ndarray): Array of MAPE scores for each LOO iteration.
-    - mean_score (float): Mean MAPE score across all iterations.
-    - std_score (float): Standard deviation of MAPE scores.
+    - scores (ndarray): Array of MAE scores for each LOO iteration.
+    - mean_score (float): Mean MAE score across all iterations.
+    - std_score (float): Standard deviation of MAE scores.
     """
     scores = np.zeros(len(Y))
     for i in range(len(Y)):
@@ -150,13 +150,13 @@ def train_models_loo(model, X, Y):
         X_tr, Y_tr = X[1-idx], Y[1-idx]
         X_val, Y_val = X[idx].reshape(1,-1), Y[idx]
         model_val = clone(model)
-        if hasattr(model,"random_state") and model.random_state is not None:
-            model.random_state += 1
-        elif hasattr(model,"seed") and model.seed is not None:
-            model.seed += 1
+        if hasattr(model_val, "random_state") and model_val.random_state is not None:
+            model_val.random_state += 1
+        elif hasattr(model_val, "seed") and model_val.seed is not None:
+            model_val.seed += 1
         model_val.fit(X_tr, Y_tr)
-        mape = score_model(model_val, X_val, Y_val)
-        scores[i] = mape
+        mae = score_model(model_val, X_val, Y_val)
+        scores[i] = mae
     return scores, np.mean(scores), np.std(scores)
 
 def loo_validation(model_key, X, Y):
