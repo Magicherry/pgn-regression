@@ -23,8 +23,6 @@ env/
 Thumbs.db
 
 saved_models/
-figures/
-tables/
 *.pkl
 # Byte-compiled / optimized / DLL files
 __pycache__/
