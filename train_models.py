@@ -57,17 +57,12 @@ def _resolve_model_args(model_key, best_combo):
         arg_vals.append(model_settings[model_key]["seed"])
     return dict(zip(arg_keys, arg_vals))
 
-def _apply_runtime_overrides(model_key, base_args, n_jobs=None, use_xgb_gpu=False):
+def _apply_runtime_overrides(model_key, base_args, n_jobs=None):
     args = dict(base_args)
     model_init = model_types[model_key].__init__
     param_names = set(inspect.signature(model_init).parameters.keys())
     if n_jobs is not None and "n_jobs" in param_names:
         args["n_jobs"] = n_jobs
-    if use_xgb_gpu and model_key == "XGB":
-        if "tree_method" in param_names:
-            args["tree_method"] = "gpu_hist"
-        if "predictor" in param_names:
-            args["predictor"] = "gpu_predictor"
     return args
 
 if __name__ == "__main__":
@@ -78,8 +73,6 @@ if __name__ == "__main__":
     parser.add_argument("--models", nargs="*", default=sorted(model_types.keys()))
     parser.add_argument("--cache", default=os.path.join("saved_models", "best_params.json"))
     parser.add_argument("--force-optimization", action="store_true")
-    parser.add_argument("--n-jobs", type=int, default=-1, help="Number of CPU jobs for supported models.")
-    parser.add_argument("--no-xgb-gpu", action="store_true", help="Disable XGBoost GPU training.")
     args = parser.parse_args()
 
     dataset_fn = DATASET_GETTERS[args.dataset]
@@ -124,8 +117,7 @@ if __name__ == "__main__":
         train_args = _apply_runtime_overrides(
             key,
             best_args,
-            n_jobs=args.n_jobs,
-            use_xgb_gpu=not args.no_xgb_gpu,
+            n_jobs=-1,
         )
         print(f"Model: {key},   Parameters: {train_args}")
         model = model_types[key](**train_args)

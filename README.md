@@ -35,8 +35,20 @@ Data is stored as CSV files in `data/` and loaded by `datasets.py`.
 
 Then run the following scripts (with the `py` or `python` or `python3` command):
 - `train_models.py`: Train all models and cache best hyperparameters.
-  - Default uses all CPU cores and enables XGBoost GPU if available.
-
+  - Default uses all CPU cores.
+  - Parameters:
+    - `--dataset`: Dataset key: `pmma_normalized`, `pmma_new`, `pmma_old`, `ps_old`, `all`.
+    - `--train-size`: Train split ratio, default `0.8`.
+    - `--seed`: Split seed, default `49163`.
+    - `--models`: Model keys to train, for example `--models RF XGB`.
+    - `--cache`: Cache file path for best parameters.
+    - `--force-optimization`: Ignore cache and re-run LOO search.
 - `generate_tables.py`: Evaluate all models and export CSV tables to `tables/`.
 - `generate_plots.py`: Generate visualizations in `figures/`.
+  - Parameters:
+    - `--figures`: Output folder path, default `figures`.
+    - `--models`: Model keys to plot, for example `--models RF XGB`.
+    - `--skip-datasets`: Skip dataset scatter plots.
+    - `--skip-heatmaps`: Skip model heatmaps.
+    - `--skip-boxplot`: Skip PS error boxplot.
   - Example: `python generate_plots.py --models RF XGB --skip-boxplot`
