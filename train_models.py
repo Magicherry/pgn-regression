@@ -51,10 +51,13 @@ def _save_cache(path, payload):
 def _resolve_model_args(model_key, best_combo):
     arg_keys = list(model_settings[model_key].keys())
     arg_vals = list(best_combo)
+    # Append fixed (non-searchable) parameters in declaration order
     if "random_state" in arg_keys:
         arg_vals.append(model_settings[model_key]["random_state"])
     elif "seed" in arg_keys:
         arg_vals.append(model_settings[model_key]["seed"])
+    if "device" in model_settings[model_key]:
+        arg_vals.append(model_settings[model_key]["device"])
     return dict(zip(arg_keys, arg_vals))
 
 def _apply_runtime_overrides(model_key, base_args, n_jobs=None):

@@ -90,7 +90,20 @@ model_settings = dict(DT = dict(max_depth=[1,2,3,4,5,6], random_state=RNG_SEED),
                       PR = dict(degree=[2,3,4,5], alpha=[0, 0.1, 0.25, 0.5, 1.0, 2.0, 4.0]),
                       RF = dict(n_estimators=[8,16,32,64], max_depth=[2,4,6,8,10,12], random_state=RNG_SEED),
                       SVM = dict(C=[1e-2,1e-1,1e0, 1e1, 1e2, 1e3, 1e4, 1e5], kernel=["rbf",], tol=[1e-9]),
-                      XGB = dict(eta = [0.001, 0.01, 0.1, 0.5, 0.75, 1.0], max_depth = [1,2,4,8,16], n_estimators = [16, 32, 48, 64], seed=RNG_SEED)
+                      XGB = dict(eta=[0.01, 0.05, 0.1, 0.3], max_depth=[2, 3, 4], n_estimators=[100, 200, 300], min_child_weight=[1, 3], subsample=[0.7, 1.0], reg_lambda=[0.0, 1.0, 3.0], seed=RNG_SEED, device="cuda")
+                    #   XGB1 = dict(
+                    #             objective=["reg:squarederror"],
+                    #             learning_rate=[0.01, 0.03],
+                    #             max_depth=[2, 3],
+                    #             n_estimators=[300, 600],
+                    #             subsample=[0.7, 0.9],
+                    #             colsample_bytree=[0.7, 0.9],
+                    #             min_child_weight=[3, 8],
+                    #             gamma=[0.0, 0.1],
+                    #             reg_alpha=[0.0],
+                    #             reg_lambda=[3.0, 10.0],
+                    #             seed=RNG_SEED,
+                    #         )
 )
 
 # Full name of each model
@@ -180,21 +193,21 @@ def loo_validation(model_key, X, Y):
     - best_std_score (float): Standard deviation of the best-performing model's scores.
     """
     params = model_settings[model_key].copy()
+    # Pop fixed (non-searchable) parameters before grid search
+    fixed = {}
     if "random_state" in params:
-        params.pop("random_state")
-        seed = dict(random_state=RNG_SEED)
+        fixed["random_state"] = params.pop("random_state")
     elif "seed" in params:
-        params.pop("seed")
-        seed = dict(seed=RNG_SEED)
-    else:
-        seed = dict()
+        fixed["seed"] = params.pop("seed")
+    if "device" in params:
+        fixed["device"] = params.pop("device")
     combos = list(itertools.product(*list(params.values())))
     mean_scores = []
     std_scores = []
     for i, combo in enumerate(combos):
         args = dict(zip(params.keys(), combo))
         print(args)
-        model = model_types[model_key](**args, **seed)
+        model = model_types[model_key](**args, **fixed)
         scores, mean_score, std_score = train_models_loo(model, X, Y)
         print(mean_score)
         mean_scores.append(mean_score)
