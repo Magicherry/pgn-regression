@@ -1,0 +1,17 @@
+{
+  "data_hash": "77dc8af6846920de60ee4772b49947d49225c2a79a568fbc8e83e1b5958ac179",
+  "dataset": "pmma_normalized",
+  "models": {
+    "XGB": {
+      "args": {
+        "eta": 0.001,
+        "max_depth": 1,
+        "n_estimators": 16,
+        "seed": 40136
+      },
+      "mean_score": 0.17262721727732094,
+      "std_score": 0.11935005354013561
+    }
+  },
+  "settings_hash": "dc3671b773ba242e6171e1a0062fb0b010c8228f266902745a7c473cf272f628"
+}
